@@ -1,6 +1,7 @@
+import bcrypt from "bcryptjs";
 import { ReadonlyURLSearchParams } from "next/dist/client/components/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-
+const SALT_ROUNDS = 10; // 盐度（或计算成本）。数字越大，安全性越高，但计算时间越长。
 // 将美分转换成美元
 export const formatCurrency = (amount: number):string => {
     return (amount / 100).toLocaleString('en-US', {
@@ -57,3 +58,21 @@ export const hasAnyError = (message:any) => {
   }
   return false;
 };
+
+
+export async function hashPassword(plainPassword: string): Promise<string> {
+      try {
+          // 1. 生成一个随机的 Salt（盐）
+          // Salt 是一个随机字符串，用于确保相同的密码每次生成不同的哈希值。
+          const salt = await bcrypt.genSalt(SALT_ROUNDS); 
+
+          // 2. 将密码和 Salt 结合进行哈希计算
+          const hashedPassword = await bcrypt.hash(plainPassword, salt);
+          
+          // 3. 返回哈希值（通常包含 Salt 和 Cost Factor），准备存入数据库
+          return hashedPassword; 
+      } catch (error) {
+          console.error('密码哈希失败:', error);
+          throw new Error('无法处理密码');
+      }
+  }

@@ -2,13 +2,14 @@
 import postgres from 'postgres';
 import { revalidatePath } from 'next/cache';
 import z from 'zod';
-import { CustomerData, FormState, Invoice } from './definition';
+import { CustomerData, FormState, Invoice, User } from './definition';
 import { unlink, writeFile } from "fs/promises";
 import { join, extname } from "path";
 import { randomBytes } from "crypto";
 import { getOldImageUrl } from './data';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import { hashPassword } from './utils';
 
 const f = process.env.IMAGE_CUSTOMER_PATH!;
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
@@ -40,6 +41,20 @@ const InvoiceSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "日期格式应为 YYYY-MM-DD"),
   status: z.enum(['pending', 'paid'], { message: "状态只能是 pending 或 paid" }),
 });
+
+const SignupFormSchema = z.object({
+  name: z
+    .string()
+    .min(2, { error: 'Name must be at least 2 characters long.' })
+    .trim(),
+  email: z.email({ error: 'Please enter a valid email.' }).trim(),
+  password: z
+    .string()
+    .min(8, { error: 'Be at least 8 characters long' })
+    .regex(/[a-zA-Z]/, { error: 'Contain at least one letter.' })
+    .regex(/[0-9]/, { error: 'Contain at least one number.' })
+    .trim(),
+})
 
 const AddInvoiceSchema = InvoiceSchema.omit({id:true});
 
@@ -313,3 +328,36 @@ export async function authenticate(
 export async function handleGoogleLogin(redirectTo: string) {
     signIn('google', { redirectTo}); // NextAuth 会自动重定向到 Google 授权页面
 }
+
+export async function createUser(prevState: FormState<User>, formData: FormData) {
+    try {
+        const s = SignupFormSchema.safeParse({
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: formData.get('password'),
+        });
+        if (!s.success) {
+            return {
+                success: false,
+                message: s.error.format()
+            }
+        }
+        const { email, password, name } = s.data;
+        const passwordsMatch = await hashPassword(password);
+        const result = await sql`
+            INSERT INTO users (email,password,name)
+            VALUES (${email}, ${passwordsMatch},${name})
+        `;
+        return {
+            success: true,
+            message: {}
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            success: false,
+            message: { _errors: [error instanceof Error ? error.message : "未知错误"] }
+        };
+    }
+}
+

@@ -476,3 +476,20 @@ export async function getOldImageUrl(id: string): Promise<string | undefined> {
     const result = await sql`SELECT image_url FROM customers WHERE id = ${id}`;
     return result[0]?.image_url;
 }
+
+export async function getUserEmail(email: string): Promise<string | undefined> {
+    try {
+        const result = await sql`SELECT email FROM users WHERE email = ${email}`;
+        return result[0].email;
+    } catch (error) {
+        console.error(error)
+        return undefined;
+    }
+}
+
+// export async function createUser(email: string,password:string,name:string): Promise<void> {
+//     const result = await sql`
+//         INSERT INTO users (email,password,name)
+//         VALUES (${email}, ${password},${name})
+//     `;
+// }
