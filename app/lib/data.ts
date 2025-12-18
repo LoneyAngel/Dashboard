@@ -8,6 +8,7 @@ import { formatCurrency, formatDate } from './utils';
 import z from 'zod';
 import { Customer, revenue } from './definition';
 import { unstable_cache } from 'next/cache';
+import { generateOTP } from './email';
 //如果数据获取失败怎么处理
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
@@ -487,9 +488,61 @@ export async function getUserEmail(email: string): Promise<string | undefined> {
     }
 }
 
-// export async function createUser(email: string,password:string,name:string): Promise<void> {
-//     const result = await sql`
-//         INSERT INTO users (email,password,name)
-//         VALUES (${email}, ${password},${name})
-//     `;
-// }
+export async function sendMailCode(email: string) {
+    try {
+        const code = generateOTP();
+        
+        // 建议在 SQL 层处理过期时间，确保使用数据库服务器时间
+        // 假设使用的是 Postgres
+        await sql.begin(async (sql) => {
+            // 1. 删除旧验证码
+            await sql`DELETE FROM verification_token WHERE identifier = ${email}`;
+            
+            // 2. 插入新验证码，有效期设为 5 分钟
+            await sql`
+                INSERT INTO verification_token (identifier, token, expires) 
+                VALUES (${email}, ${code}, NOW() + INTERVAL '5 minutes')
+            `;
+        });
+
+        const { sendOTP } = await import('./email');
+        await sendOTP(email, code);
+        
+        return { success: true };
+    } catch (error) {
+        console.error('发送验证码失败:', error);
+        return { success: false, error: '发送验证码失败' };
+    }
+}
+
+export async function verifyCode(email: string, code: string) {
+    try {
+        // 直接在查询中通过 SQL 判断是否过期，减少服务器与 DB 之间的时间误差
+        const result = await sql`
+            SELECT token, expires 
+            FROM verification_token
+            WHERE identifier = ${email} 
+              AND expires > NOW() 
+            ORDER BY expires DESC 
+            LIMIT 1
+        `;
+        
+        if (result.length === 0) {
+            return { success: false, error: '验证码不存在或已过期' };
+        }
+        
+        const { token: storedCode } = result[0];
+        
+        if (storedCode !== code) {
+            return { success: false, error: '验证码错误' };
+        }
+        
+        // 验证成功后立即删除
+        await sql`DELETE FROM verification_token WHERE identifier = ${email}`;
+        
+        return { success: true };
+    } catch (error) {
+        console.error('验证验证码失败:', error);
+        return { success: false, error: '验证过程出现错误' };
+    }
+}

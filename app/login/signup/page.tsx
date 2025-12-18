@@ -8,7 +8,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useActionState, useEffect, useRef, useState } from "react"
-import { getUserEmail } from "@/app/lib/data"
+import { getUserEmail, sendMailCode } from "@/app/lib/data"
 import { useRouter } from "next/navigation"
 import { AlertCircleIcon, ArrowLeftToLine, CheckCircle2Icon } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
@@ -16,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { hasAnyError } from "@/app/lib/utils"
 import { FormState, User } from "@/app/lib/definition"
 import { createUser } from "@/app/lib/action"
+import { InputOTPPattern } from "@/ui/login/code"
 // 注册成功之后，返回登陆页面
 
 export default function Register({
@@ -23,25 +24,58 @@ export default function Register({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) { 
   const router = useRouter()
+  // 换页
   const [isNextStep, setIsNextStep] = useState(false)
+  // 用户信息
   const [user, setUser] = useState({ email: '', password: '', name: ''})
+  // 提示信息
   const [message, setMessage] = useState<{ type: 'default' | 'destructive'; head: string;text:string } | null>(null);
+  // 提示信息倒计时
   const timeOutRef = useRef<any>(null);
+  // 用于发送验证码的限制定时器
   const isUser = useRef(false);
+  // 是否允许下一步
+  const [canNext, setCanNext] = useState(false)
+  // 验证码倒计时
+  const [countdown, setCountdown] = useState(0); // 添加倒计时状态
   const initialState: FormState<User> = {
     success:false,
     message:{}
   }
-  const [loading, setLoading] = useState(false)
   const [state,stateAction,isPending] = useActionState(createUser,initialState)
-  async function handleNextStep() {
+  async function handleSendCode() {
+    // 发送验证码
+    // 如果正在倒计时，则不执行发送操作
+    if (countdown > 0) return;
+    
     // 判断当前邮箱是否注册过
     if(user.email.trim().length >= 5) {
-      setLoading(true)
-      try {
         const _ = await getUserEmail(user.email.trim())
         if (!_) {
-          setIsNextStep(true)
+          const s = await sendMailCode(user.email.trim())
+          if(s.success){
+            setMessage({
+            type: 'default',
+            head: 'success',
+            text: '验证码已发送至您的邮箱，请注意查收'
+          })}
+          else{
+            setMessage({
+            type: 'destructive',
+            head: 'error',
+            text: '发送验证码失败'
+          })
+          timeOutRef.current = setTimeout(() => {
+            setMessage(null)
+            return 
+          },3000)
+          }
+          // 启动60秒倒计时
+          setCountdown(60);
+          
+          timeOutRef.current = setTimeout(() => {
+            setMessage(null)
+          },3000)
         }
         else {
           setMessage({
@@ -51,12 +85,8 @@ export default function Register({
           })
           timeOutRef.current = setTimeout(() => {
             setMessage(null)
-            setUser({...user, email: ''})
           },3000)
-        }
-      } finally {
-        setLoading(false)
-      }
+      } 
     }
     else {
       setMessage({
@@ -69,32 +99,19 @@ export default function Register({
       },3000)
     }
   }
-
-  // async function handleRegister() {
-  //   if (!passwordRegex.test(user.password)) {
-      // setMessage({
-      //   type: 'destructive',
-      //   head: 'error',
-      //   text: '密码必须包含字母和数字'
-      // })
-  //     timeOutRef.current = setTimeout(() => {
-  //       setMessage(null)
-  //     },3000)
-  //     return
-  //   }
-  //   try {
-  //     await createUser(user)
-  //     setMessage({
-  //       type: 'default',
-  //       head: 'success',
-  //       text: '注册成功'
-  //     })
-  //     setTimeout(()=>{
-  //       setMessage(null)
-  //       router.replace("/login")
-  //     },3000)
-  //   } 
-  // }
+  
+  // 倒计时效果
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (countdown > 0) {
+      timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [countdown]);
   useEffect(()=>{
       if(!isPending&&(isUser.current)){
           isUser.current = false;
@@ -156,19 +173,29 @@ export default function Register({
                   required
                 />
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="code">verify code</Label>
+                <div className="flex justify-between gap-2">
+                  <InputOTPPattern email={user.email} canNext={canNext} setCanNext={setCanNext} setMessage={setMessage} timeOutRef={timeOutRef}/>
+                  <Button 
+                    className="w-full"
+                    onClick={handleSendCode}
+                    disabled={countdown > 0}
+                  >
+                    {countdown > 0 ? `${countdown}s后重新发送` : 'send code'}
+                  </Button>
+                </div>
+              </div>
               <Button 
                 className="w-full"
-                onClick={handleNextStep}
-                disabled={loading}
+                disabled={!canNext}
+                onClick={()=>{
+                  if(canNext){
+                    setIsNextStep(true)
+                  }
+                }}
               >
-                {loading ? (
-                  <>
-                    <Spinner className="mr-2 h-4 w-4" />
-                    处理中...
-                  </>
-                ) : (
-                  "下一步"
-                )}
+                下一步
               </Button>
             </div>
           </CardContent>
