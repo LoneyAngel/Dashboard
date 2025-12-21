@@ -4,6 +4,7 @@ import { BarChart_Skeleton, Cards_Skeleton, LastInvoices_Skeleton } from "@/ui/s
 import Cards from "@/ui/dashboard/cards";
 import BarChart from "@/ui/dashboard/chart";
 import type { Metadata } from 'next';
+import { Separator } from "@/components/ui/separator";
 
 export const metadata: Metadata = {
     title: 'Pron Dashboard',
@@ -15,6 +16,7 @@ export default async function Page() {
             <Suspense fallback={<Cards_Skeleton />}>
                 <Cards />
             </Suspense>
+            <Separator className="my-4"/>
             <div className="flex flex-1 mt-4 gap-4">
                 <div className="flex flex-col flex-1">
                     <header className="text-3xl mb-8 font-zen">Recent Revenue</header>
