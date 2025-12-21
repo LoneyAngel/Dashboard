@@ -8,7 +8,7 @@ import { useActionState, useEffect, useRef, useState } from "react"
 import styles from "./table.module.css"
 import { SquarePen, Trash } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
-import CenterAlert from "@/ui/sma/alert"
+import CenterAlert from "@/ui/small_ui/alert"
 function Table({data}:{data:Invoice[]}){
     const [state,stateAction,isPending] = useActionState(deleteInvoicesById,{
         success:false,

@@ -1,12 +1,12 @@
-import Pagination from "@/ui/sma/pagination";
-import Search from "@/ui/sma/search";
+import Pagination from "@/ui/small_ui/pagination";
+import Search from "@/ui/small_ui/search";
 import { CustomerListSkeleton, PaginationSkeleton } from "@/ui/skeleton";
 import { Suspense } from "react";
 import type { Metadata } from 'next';
-import AddButton from "@/ui/sma/addButton";
+import AddButton from "@/ui/small_ui/addButton";
 import CustomerTable from "@/ui/dashboard/customer/table/table";
 import { getPaginatedCustomerCount } from "@/app/lib/data";
-import Filter from "@/ui/sma/filter";
+import Filter from "@/ui/small_ui/filter";
 
 export const metadata: Metadata = {
     title: 'Pron 账单',

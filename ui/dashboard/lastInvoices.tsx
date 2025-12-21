@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator"
 export default async function LastInvoices() {
     const lastInvoices = await getLastInvoices()
     return (
-        <div className="flex flex-col overflow-auto h-[400px] border-blue-50 border-[15px] rounded-3xl gap-4 p-4 ">
+        <div className="flex flex-col overflow-auto h-[350px] border-bg border-[15px] rounded-3xl justify-around gap-2 p-4 ">
             {
                 lastInvoices.map((invoice) => {
                     return (

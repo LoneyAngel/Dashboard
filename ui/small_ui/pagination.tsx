@@ -1,9 +1,6 @@
-import { getPaginatedCustomerCount, getPaginatedInvoiceCount } from '@/app/lib/data';
 import PaginationInteractive from './pagination.client';
 export default async function Pagination({page,query,filterParams,getPaginatedCount}:{page:string,query:string,filterParams?:Record<string, string>,getPaginatedCount:any}) {
     async function generatePaginationArray(current:number): Promise<string[]>{
-        // console.log(`当前页码：${current}，总页码：${totalPages}`);
-        // 获取页数
         const _ = await getPaginatedCount({ query, filterParams })
         const totalPages = Math.ceil(_ / 6);
         // 返回页数数组

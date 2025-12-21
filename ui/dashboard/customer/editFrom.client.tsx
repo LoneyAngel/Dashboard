@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { ArrowLeftToLine } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import CenterAlert from "@/ui/sma/alert";
+import CenterAlert from "@/ui/small_ui/alert";
 export default function EditFromInteractive({customer}:{customer:Customer}) {
     const router = useRouter();
     // Action初始状态

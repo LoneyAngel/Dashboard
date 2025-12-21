@@ -31,7 +31,7 @@ export function BarChart_Skeleton() {
 // lastInvoices的骨架
 export function LastInvoices_Skeleton() {
     return (
-        <div className="flex flex-col overflow-auto h-[400px] border-blue-50 border-[15px] rounded-3xl gap-4 p-4">
+        <div className="flex flex-col overflow-auto h-[350px] border-gray border-[15px] rounded-3xl justify-around p-4">
             {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="flex-1">
                     <div className="flex flex-1 pl-6 pr-10 items-center justify-between relative">

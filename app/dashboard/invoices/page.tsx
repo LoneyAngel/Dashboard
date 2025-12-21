@@ -1,11 +1,11 @@
 import InvoicesTable from "@/ui/dashboard/invoices/table/table";
-import Search from "@/ui/sma/search";
+import Search from "@/ui/small_ui/search";
 import { InvoiceListSkeleton, PaginationSkeleton } from "@/ui/skeleton";
 import { Suspense } from "react";
 import type { Metadata } from 'next';
-import AddButton from "@/ui/sma/addButton";
-import Pagination from "@/ui/sma/pagination";
-import Filter from "@/ui/sma/filter";
+import AddButton from "@/ui/small_ui/addButton";
+import Pagination from "@/ui/small_ui/pagination";
+import Filter from "@/ui/small_ui/filter";
 import { getPaginatedInvoiceCount } from "@/app/lib/data";
 
 export const metadata: Metadata = {

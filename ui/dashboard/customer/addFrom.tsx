@@ -6,9 +6,9 @@ import { hasAnyError } from "@/app/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircleIcon, CheckCircle2Icon,ArrowLeftToLine } from "lucide-react";
+import { ArrowLeftToLine } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner"
+import CenterAlert from "@/ui/small_ui/alert";
 export default function AddFrom() {
     const router = useRouter();
     // Action初始状态
@@ -79,21 +79,7 @@ export default function AddFrom() {
     return (
         <div className="h-full">
             {
-                message && (
-                    <Alert variant={message.type} className="p-4 absolute top-2 w-[20%] left-1/2 transform -translate-x-1/2 z-10">
-                        {
-                            message.type === "default" ? (
-                                <CheckCircle2Icon className="h-6 w-6" />
-                            ) : (
-                                <AlertCircleIcon  className="h-6 w-6" />
-                            )
-                        }
-                        <AlertTitle>{message.head}</AlertTitle>
-                        <AlertDescription>
-                            {message.text}
-                        </AlertDescription>
-                    </Alert>
-                )
+                message && <CenterAlert message={message}/>
             }
             <button className="h-8 w-8 hover:scale-105 ml-2" onClick={()=>history.back()}>
                 <ArrowLeftToLine/>

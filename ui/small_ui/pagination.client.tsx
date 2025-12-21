@@ -7,7 +7,7 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { updateQueryParams} from '../../app/lib/utils';
 export default function PaginationInteractive({pagination,page}:{pagination:string[],page:string}) {
     const router = useRouter();
-    const pathname = usePathname(); // 推荐：比 router.pathname 更可靠
+    const pathname = usePathname();
     const searchParams = useSearchParams();
     return (
         <div className="flex justify-start pl-16 gap-6 font-inter h-full">

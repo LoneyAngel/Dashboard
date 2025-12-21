@@ -8,7 +8,7 @@ import {
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import { usePathname, useRouter, useSearchParams, ReadonlyURLSearchParams } from "next/navigation"
-import { updateQueryParams } from "@/app/lib/utils" // 确保这个函数在
+import { updateQueryParams } from "@/app/lib/utils"
 import { useRef, useState, useCallback, useEffect } from "react"
 
 // 辅助函数：从 URL 初始化筛选状态 (假设：URL中不存在的参数默认为 true)
@@ -31,7 +31,6 @@ export default function Filter({ className, filterArray }: { className?: string,
 
     // 1. 修正：handleSearch 的定义
     const handleSearch = useCallback((dict: Record<string, boolean>) => {
-        // 假设 updateQueryParams 接受一个字典来更新 URL
         updateQueryParams(dict, searchParams, pathname, router,1);
     }, [searchParams, pathname, router]);
 
@@ -70,10 +69,9 @@ export default function Filter({ className, filterArray }: { className?: string,
                         {
                             filterArray.map((item) => (
                                 <div key={item} className="flex items-center space-x-2">
-                                    {/* 注意：这里的 defaultChecked 应该改为 checked，因为它现在由 likeDict 控制 */}
                                     <Checkbox 
                                         id={item} 
-                                        checked={likeDict[item]} // 使用 checked 而非 defaultChecked
+                                        checked={likeDict[item]}
                                         onCheckedChange={(status) => {
                                             // 4. 修正：更新状态
                                             setLikeDict(prev => ({ ...prev, [item]: Boolean(status) }));

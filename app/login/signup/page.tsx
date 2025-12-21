@@ -10,13 +10,13 @@ import { Label } from "@/components/ui/label"
 import { useActionState, useEffect, useRef, useState } from "react"
 import { getUserEmail, sendMailCode } from "@/app/lib/data"
 import { useRouter } from "next/navigation"
-import { AlertCircleIcon, ArrowLeftToLine, CheckCircle2Icon } from "lucide-react"
+import { ArrowLeftToLine} from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { hasAnyError } from "@/app/lib/utils"
 import { FormState, User } from "@/app/lib/definition"
 import { createUser } from "@/app/lib/action"
 import { InputOTPPattern } from "@/ui/login/code"
+import CenterAlert from "@/ui/small_ui/alert"
 // 注册成功之后，返回登陆页面
 
 export default function Register({
@@ -138,21 +138,7 @@ export default function Register({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       {
-          message && (
-              <Alert variant={message.type} className="p-4 absolute top-2 w-[20%] left-1/2 transform -translate-x-1/2 z-10">
-                  {
-                      message.type === "default" ? (
-                          <CheckCircle2Icon className="h-6 w-6" />
-                      ) : (
-                          <AlertCircleIcon  className="h-6 w-6" />
-                      )
-                  }
-                  <AlertTitle>{message.head}</AlertTitle>
-                  <AlertDescription>
-                      {message.text}
-                  </AlertDescription>
-              </Alert>
-          )
+        message && <CenterAlert message={message}/>
       }
       {!isNextStep ? (
         <Card>

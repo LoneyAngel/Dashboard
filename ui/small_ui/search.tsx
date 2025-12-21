@@ -2,7 +2,7 @@
 /**
  * 合适的时机和url中的参数同步
  * 添加防抖
- * 确保括的组件完全独立
+ * 确保组件完全独立
  */
 import { useEffect, useRef, useState } from 'react';
 import { updateQueryParams } from '@/app/lib/utils';
@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import { Input } from "@/components/ui/input"
 export default function Search({className,q}:{className?:string,q:string}) {
     const router = useRouter();
-    const pathname = usePathname(); // 推荐：比 router.pathname 更可靠
+    const pathname = usePathname();
     const searchParams = useSearchParams();
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [query, setQuery] = useState(q);
