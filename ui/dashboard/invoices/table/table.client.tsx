@@ -57,11 +57,11 @@ function Table({data}:{data:Invoice[]}){
         }
     },[deleteId])
     return (
-        <div className="w-full h-full border border-gray-300 shadow-sm p-2">
+        <div className="w-full h-full p-2 bg-gray-50 rounded-lg shadow-lg">
             {
                 message && <CenterAlert message={message}/>
             }
-            <table className={`w-full ${styles.table} border border-gray-300 shadow-sm`}>
+            <table className={`w-full ${styles.table}`}>
                 <thead className="text-left">
                     <tr>
                         <th className="flex-4 px-6">Customer</th>

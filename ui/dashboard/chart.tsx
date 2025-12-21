@@ -3,8 +3,8 @@ import BarChartInteractive from "./chart.client"
 
 export default async function BarChart() {
     const _ = await initChartData()
-    let labels:string[]=[]
-    let data:string[]=[]
+    const labels:string[]=[]
+    const data:string[]=[]
     function initdata() {        
         _?.forEach((item) => {
             labels.push(item.month)
@@ -13,7 +13,7 @@ export default async function BarChart() {
     }
     initdata()
     return (
-        <div className="flex items-center max-w-full w-[450px] h-full ">
+        <div className="flex items-center max-w-full w-full h-full p-4">
             <BarChartInteractive labels={labels} data={data} />
         </div>
     );

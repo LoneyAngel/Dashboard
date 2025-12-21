@@ -21,7 +21,7 @@ export default function Table({data}:{data:Customer[]}){
     const [deleteId,setDeleteId] = useState("")
     const [message, setMessage] = useState<{ type: 'default' | 'destructive'; head: string;text:string } | null>(null);
     const isUser = useRef(false)
-    const timeOutRef = useRef<any>(null);
+    const timeOutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(()=>{
         // 表示用户操作结束
@@ -63,13 +63,13 @@ export default function Table({data}:{data:Customer[]}){
     },[deleteId])
     
     return (
-        <div className="w-full h-full p-2 border border-gray-300 shadow-sm">
+        <div className="w-full h-full p-2 bg-gray-50 rounded-lg shadow-lg">
             {
                 message?.head && (
                     <CenterAlert message={message}/>
                 )
             }
-            <table className={`w-full ${styles.table} text-center border border-gray-300 shadow-sm`}>
+            <table className={`w-full ${styles.table} text-center`}>
                 <thead className="">
                     <tr>
                         <th className="flex-4 px-6">头像</th>
